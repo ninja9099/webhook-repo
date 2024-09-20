@@ -50,17 +50,25 @@
             fetch('/get-latest-events')
                 .then(response => response.json())
                 .then(data => {
-                    // Get the event list element
                     const eventList = document.getElementById('event-list');
-                    eventList.innerHTML = '';  // Clear the list
 
-                    // Append each event as a list item
+                    // Append only events that have not been displayed yet
                     data.forEach(event => {
-                        const li = document.createElement('li');
-                        li.textContent = event.replace(/on (.+)/, function (match, p1) {
-                            return 'on ' + formatTimestamp(p1);
-                        });
-                        eventList.appendChild(li);
+                        const eventTimestamp = event.match(/on (.+)/)[1];  // Extract the timestamp part
+
+                        if (!latestTimestamp || new Date(eventTimestamp) > new Date(latestTimestamp)) {
+                            // Only add the event if its timestamp is more recent than the latest displayed event
+                            const li = document.createElement('li');
+
+                            // Assume the event has a timestamp in UTC format and pass it to the formatTimestamp function
+                            li.textContent = event.replace(/on (.+)/, function (match, p1) {
+                                return 'on ' + formatTimestamp(p1);
+                            });
+                            eventList.appendChild(li);
+
+                            // Update the latest timestamp to the current event's timestamp
+                            latestTimestamp = eventTimestamp;
+                        }
                     });
                 })
                 .catch(error => console.error('Error fetching events:', error));
