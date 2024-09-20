@@ -44,4 +44,13 @@ POST http://127.0.0.1:5000/webhook/receiver
 
 You need to use this as the base and setup the flask app. Integrate this with MongoDB (commented at `app/extensions.py`)
 
+
+After Mongo is running locally configure a ngrok and create a tunnel for your local server using command
+
+```bash
+ngrok http 127.0.0.1:5000
+```
+you will get a url use that url in your github webhook to forward the action to your local machine
+
+
 *******************

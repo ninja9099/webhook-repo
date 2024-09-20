@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Webhook Events</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background-color: #f9f9f9;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h1>Latest 10 GitHub Events</h1>
+    <ul id="event-list">
+        <!-- Anchor point for new event from polling  -->
+    </ul>
+
+    <script>
+
+        function formatTimestamp(utcTimestamp) {
+            const date = new Date(utcTimestamp);
+            const options = {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                timeZone: 'UTC',
+                timeZoneName: 'short'
+            };
+            return date.toLocaleDateString('en-GB', options);
+        }
+        function fetchLatestEvents() {
+            fetch('/get-latest-events')
+                .then(response => response.json())
+                .then(data => {
+                    // Get the event list element
+                    const eventList = document.getElementById('event-list');
+                    eventList.innerHTML = '';  // Clear the list
+
+                    // Append each event as a list item
+                    data.forEach(event => {
+                        const li = document.createElement('li');
+                        li.textContent = event.replace(/on (.+)/, function (match, p1) {
+                            return 'on ' + formatTimestamp(p1);
+                        });
+                        eventList.appendChild(li);
+                    });
+                })
+                .catch(error => console.error('Error fetching events:', error));
+        }
+
+        // Fetch events immediately on page load
+        fetchLatestEvents();
+
+        // Set up polling to fetch events every 15 seconds
+        setInterval(fetchLatestEvents, 15000);
+    </script>
+</body>
+</html>
